@@ -1,12 +1,13 @@
-<!doctype html>
-<html amp lang="<?php language_attributes(); ?>">
+<!DOCTYPE html>
+<html <?php language_attributes(); ?> amp>
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
-    <meta name="theme-color" content="#ffffff">
+    <meta charset="<?php bloginfo('charset'); ?>">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="profile" href="https://gmpg.org/xfn/11">
     <?php wp_head(); ?>
 
+    <!-- AMP Boilerplate -->
     <style amp-boilerplate>
         body {
             -webkit-animation: -amp-start 8s steps(1, end) 0s 1 normal both;
@@ -76,24 +77,19 @@
         </style>
     </noscript>
 
-    <!-- AMP Runtime -->
-    <script async src="https://cdn.ampproject.org/v0.js"></script>
-
     <!-- AMP Components -->
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+    <script async custom-element="amp-sidebar" src="https://cdn.ampproject.org/v0/amp-sidebar-0.1.js"></script>
     <script async custom-element="amp-ad" src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
+
+    <!-- Google Fonts for AMP -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Custom Styles -->
     <style amp-custom>
-        <?php
-        // Include the main stylesheet inline
-        $css_file = get_template_directory() . '/style.css';
-        if (file_exists($css_file)) {
-            $css = file_get_contents($css_file);
-            // Remove any !important declarations as they're not allowed in AMP
-            $css = preg_replace('/\s*!important/', '', $css);
-            echo $css;
-        }
-        ?>
+        <?php include get_template_directory() . '/style.css'; ?>
     </style>
 </head>
 
@@ -101,37 +97,49 @@
     <?php wp_body_open(); ?>
 
     <div id="page" class="site">
-        <header id="masthead" class="site-header">
-            <div class="site-branding">
-                <?php if (is_front_page() && is_home()) : ?>
-                    <h1 class="site-title">
-                        <a href="<?php echo esc_url(home_url('/')); ?>" rel="home">
-                            <?php bloginfo('name'); ?>
-                        </a>
-                    </h1>
-                <?php else : ?>
-                    <p class="site-title">
-                        <a href="<?php echo esc_url(home_url('/')); ?>" rel="home">
-                            <?php bloginfo('name'); ?>
-                        </a>
-                    </p>
-                <?php endif; ?>
+        <!-- Desktop Sidebar -->
+        <aside class="desktop-sidebar">
+            <?php get_sidebar(); ?>
+        </aside>
 
-                <?php
-                $description = get_bloginfo('description', 'display');
-                if ($description || is_customize_preview()) :
-                ?>
-                    <p class="site-description"><?php echo $description; ?></p>
-                <?php endif; ?>
-            </div>
+        <!-- Mobile Menu Toggle -->
+        <button on="tap:sidebar-mobile.toggle" class="menu-toggle" aria-controls="sidebar-mobile" aria-expanded="false">
+            <span class="menu-toggle-icon"></span>
+            <span class="sr-only">Menu</span>
+        </button>
 
-            <nav id="site-navigation" class="main-navigation">
-                <?php
-                wp_nav_menu(array(
-                    'theme_location' => 'primary',
-                    'menu_id' => 'primary-menu',
-                    'fallback_cb' => false,
-                ));
-                ?>
-            </nav>
-        </header>
+        <!-- Mobile Sidebar -->
+        <amp-sidebar id="sidebar-mobile" layout="nodisplay" side="left">
+            <?php get_sidebar(); ?>
+        </amp-sidebar>
+
+        <!-- Main Content Wrapper -->
+        <div class="site-wrapper">
+            <!-- Header -->
+            <header id="masthead" class="site-header">
+                <div class="site-header-inner">
+                    <?php if (is_single() || is_page()) : ?>
+                        <nav class="breadcrumbs">
+                            <?php
+                            if (is_single()) {
+                                $categories = get_the_category();
+                                if ($categories) {
+                                    $category = $categories[0];
+                                    echo '<a href="' . esc_url(home_url('/')) . '">Home</a>';
+                                    echo '<span class="separator">/</span>';
+                                    echo '<a href="' . esc_url(get_category_link($category->term_id)) . '">' . esc_html($category->name) . '</a>';
+                                }
+                            } else {
+                                echo '<a href="' . esc_url(home_url('/')) . '">Home</a>';
+                            }
+                            ?>
+                        </nav>
+                    <?php endif; ?>
+                </div>
+            </header>
+
+            <!-- Main Content Area -->
+            <main id="content" class="site-content">
+                <?php if (function_exists('amp_auto_ads_tag') && is_single()) : ?>
+                    <?php amp_auto_ads_tag(); ?>
+                <?php endif; ?>

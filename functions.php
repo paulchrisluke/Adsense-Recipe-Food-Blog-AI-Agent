@@ -25,10 +25,26 @@ function tiffycooks_setup()
     // Enable support for Post Thumbnails on posts and pages
     add_theme_support('post-thumbnails');
 
+    // Add theme support for custom logo
+    add_theme_support('custom-logo', array(
+        'height'      => 48,
+        'width'       => 48,
+        'flex-width'  => true,
+        'flex-height' => true,
+    ));
+
+    // Add theme support for site icon
+    add_theme_support('site-icon', array(
+        'sizes' => array(48, 96)
+    ));
+
     // Register nav menus
     register_nav_menus(array(
-        'primary' => esc_html__('Primary Menu', 'adsense-recipe-food-blog'),
+        'primary' => esc_html__('Primary Menu', 'tiffycooks'),
     ));
+
+    // Add theme support for AMP
+    add_theme_support('amp');
 }
 add_action('after_setup_theme', 'tiffycooks_setup');
 
@@ -258,3 +274,31 @@ function tiffycooks_get_instructions($post_id)
 
     return $instructions;
 }
+
+/**
+ * Register navigation menus
+ */
+function tiffycooks_register_menus()
+{
+    register_nav_menus(array(
+        'primary' => __('Primary Menu', 'tiffycooks'),
+    ));
+}
+add_action('init', 'tiffycooks_register_menus');
+
+/**
+ * Register widget area
+ */
+function tiffycooks_widgets_init()
+{
+    register_sidebar(array(
+        'name'          => __('Sidebar', 'tiffycooks'),
+        'id'            => 'sidebar-1',
+        'description'   => __('Add widgets here.', 'tiffycooks'),
+        'before_widget' => '<section id="%1$s" class="widget %2$s">',
+        'after_widget'  => '</section>',
+        'before_title'  => '<h2 class="widget-title">',
+        'after_title'   => '</h2>',
+    ));
+}
+add_action('widgets_init', 'tiffycooks_widgets_init');
