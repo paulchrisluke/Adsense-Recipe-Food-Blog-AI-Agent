@@ -6,9 +6,28 @@
  * @package TiffyCooks
  */
 
+// Exit if accessed directly
 if (!defined('ABSPATH')) {
-    exit; // Exit if accessed directly
+    exit;
 }
+
+// Handle debug constants if not already defined
+if (!defined('WP_DEBUG')) {
+    define('WP_DEBUG', false);
+}
+
+if (!defined('WP_DEBUG_LOG')) {
+    define('WP_DEBUG_LOG', false);
+}
+
+if (!defined('WP_DEBUG_DISPLAY')) {
+    define('WP_DEBUG_DISPLAY', false);
+}
+
+// Include required files
+require_once get_template_directory() . '/inc/class-recipe-manager.php';
+require_once get_template_directory() . '/inc/adsense.php';
+require_once get_template_directory() . '/inc/schema.php';
 
 // Theme Setup
 function tiffycooks_amp_setup()
@@ -23,7 +42,15 @@ function tiffycooks_amp_setup()
     add_theme_support('post-thumbnails');
 
     // Add support for AMP
-    add_theme_support('amp');
+    add_theme_support('amp', array(
+        'paired' => false, // Force AMP-only mode
+        'templates_supported' => array(
+            'is_singular' => true,
+            'is_front_page' => true,
+            'is_home' => true,
+            'is_archive' => true
+        ),
+    ));
 
     // Register nav menus
     register_nav_menus(array(
@@ -98,19 +125,27 @@ require_once get_template_directory() . '/inc/recipe-schema.php';
 // Save Recipe Meta Box Data
 function tiffycooks_save_recipe_meta_box($post_id)
 {
+    // Check if our nonce is set
     if (!isset($_POST['tiffycooks_recipe_meta_box_nonce'])) {
         return;
     }
+
+    // Verify that the nonce is valid
     if (!wp_verify_nonce($_POST['tiffycooks_recipe_meta_box_nonce'], 'tiffycooks_recipe_meta_box')) {
         return;
     }
+
+    // If this is an autosave, our form has not been submitted
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
         return;
     }
+
+    // Check the user's permissions
     if (!current_user_can('edit_post', $post_id)) {
         return;
     }
 
+    // Save recipe details
     $fields = array(
         'recipe_prep_time' => 'intval',
         'recipe_cook_time' => 'intval',
@@ -118,9 +153,6 @@ function tiffycooks_save_recipe_meta_box($post_id)
         'recipe_ingredients' => 'sanitize_textarea_field',
         'recipe_instructions' => 'sanitize_textarea_field',
         'recipe_notes' => 'sanitize_textarea_field',
-        'recipe_video_url' => 'esc_url_raw',
-        'recipe_video_embed' => 'wp_kses_post',
-        'recipe_video_thumbnail_id' => 'intval'
     );
 
     foreach ($fields as $field => $sanitize_callback) {
@@ -136,6 +168,46 @@ function tiffycooks_save_recipe_meta_box($post_id)
     }
 }
 add_action('save_post', 'tiffycooks_save_recipe_meta_box');
+
+// Save Video Meta Box Data
+function tiffycooks_save_video_meta_box($post_id)
+{
+    // Check if our nonce is set
+    if (!isset($_POST['tiffycooks_video_meta_box_nonce'])) {
+        return;
+    }
+
+    // Verify that the nonce is valid
+    if (!wp_verify_nonce($_POST['tiffycooks_video_meta_box_nonce'], 'tiffycooks_video_meta_box')) {
+        return;
+    }
+
+    // If this is an autosave, our form has not been submitted
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        return;
+    }
+
+    // Check the user's permissions
+    if (!current_user_can('edit_post', $post_id)) {
+        return;
+    }
+
+    // Save video details
+    $fields = array(
+        'recipe_video_url' => 'esc_url_raw',
+        'recipe_video_embed' => 'wp_kses_post',
+        'recipe_video_thumbnail_id' => 'intval',
+    );
+
+    foreach ($fields as $field => $sanitize_callback) {
+        if (isset($_POST[$field])) {
+            $value = $_POST[$field];
+            $value = call_user_func($sanitize_callback, $value);
+            update_post_meta($post_id, '_' . $field, $value);
+        }
+    }
+}
+add_action('save_post', 'tiffycooks_save_video_meta_box');
 
 // Helper function to get recipe ingredients as array
 function tiffycooks_get_ingredients($post_id)
@@ -222,18 +294,70 @@ function tiffycooks_format_time($minutes)
 // Enqueue scripts and styles
 function tiffycooks_amp_scripts()
 {
-    wp_enqueue_style('tiffycooks-amp-style', get_stylesheet_uri(), array(), '1.0.0');
+    if (function_exists('is_amp_endpoint') && is_amp_endpoint()) {
+        // Remove all non-AMP scripts
+        wp_dequeue_script('jquery');
+        wp_dequeue_script('jquery-migrate');
+
+        // Add AMP-specific styles inline
+        $custom_css = '
+            /* Add your AMP-specific styles here */
+            .recipe-content {
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+            .recipe-meta {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 20px;
+                margin-bottom: 30px;
+            }
+            .recipe-instructions {
+                counter-reset: instruction;
+                list-style-type: none;
+                padding: 0;
+            }
+            .recipe-instructions li {
+                counter-increment: instruction;
+                margin-bottom: 15px;
+                padding-left: 40px;
+                position: relative;
+            }
+            .recipe-instructions li:before {
+                content: counter(instruction);
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 30px;
+                height: 30px;
+                background: #f0f0f0;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+            }
+            amp-ad {
+                margin: 2em 0;
+                min-height: 250px;
+            }
+        ';
+        wp_add_inline_style('amp-custom', $custom_css);
+    }
 }
-add_action('wp_enqueue_scripts', 'tiffycooks_amp_scripts');
+add_action('wp_enqueue_scripts', 'tiffycooks_amp_scripts', 20);
 
 // Add AMP-specific meta tags
 function tiffycooks_amp_add_meta_tags()
 {
     if (function_exists('is_amp_endpoint') && is_amp_endpoint()) {
         echo '<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">';
+        echo '<meta name="amp-google-client-id-api" content="googleanalytics">';
+        echo '<script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>';
     }
 }
-add_action('wp_head', 'tiffycooks_amp_add_meta_tags');
+add_action('wp_head', 'tiffycooks_amp_add_meta_tags', 1);
 
 // AdSense Integration
 function tiffycooks_amp_adsense_script()
@@ -342,3 +466,59 @@ add_action('wp_ajax_tiffycooks_generate_recipe', 'tiffycooks_ajax_generate_recip
 
 // Include editor UI modifications
 require_once get_template_directory() . '/inc/editor-ui.php';
+
+/**
+ * Add Google Analytics tracking for AMP pages
+ */
+function tiffycooks_amp_analytics()
+{
+    if (function_exists('is_amp_endpoint') && is_amp_endpoint()) {
+        $analytics_id = get_option('tiffycooks_analytics_id');
+        if (!empty($analytics_id)) {
+?>
+            <amp-analytics type="googleanalytics">
+                <script type="application/json">
+                    {
+                        "vars": {
+                            "account": "<?php echo esc_js($analytics_id); ?>"
+                        },
+                        "triggers": {
+                            "trackPageview": {
+                                "on": "visible",
+                                "request": "pageview"
+                            }
+                        }
+                    }
+                </script>
+            </amp-analytics>
+<?php
+        }
+    }
+}
+add_action('wp_footer', 'tiffycooks_amp_analytics');
+
+/**
+ * Add settings to the WordPress Customizer
+ */
+function tiffycooks_customize_register($wp_customize)
+{
+    // Add Analytics section
+    $wp_customize->add_section('tiffycooks_analytics_settings', array(
+        'title'    => __('Analytics Settings', 'adsense-recipe-food-blog'),
+        'priority' => 120,
+    ));
+
+    // Add setting for Google Analytics ID
+    $wp_customize->add_setting('tiffycooks_analytics_id', array(
+        'default'           => '',
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+
+    $wp_customize->add_control('tiffycooks_analytics_id', array(
+        'label'       => __('Google Analytics ID', 'adsense-recipe-food-blog'),
+        'description' => __('Enter your Google Analytics ID (e.g., UA-XXXXX-Y)', 'adsense-recipe-food-blog'),
+        'section'     => 'tiffycooks_analytics_settings',
+        'type'        => 'text',
+    ));
+}
+add_action('customize_register', 'tiffycooks_customize_register');

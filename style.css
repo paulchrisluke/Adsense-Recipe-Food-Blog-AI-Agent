@@ -1,47 +1,48 @@
 /*
-Theme Name: TiffyCooks AMP Theme
-Theme URI: https://tiffycooks.com
+Theme Name: Adsense Recipe Food Blog
+Theme URI: https://tiffycooks.com/
 Author: TiffyCooks
-Author URI: https://tiffycooks.com
-Description: A WordPress theme for recipe food blogs with AMP and AdSense support
+Author URI: https://tiffycooks.com/
+Description: An AMP-compatible WordPress theme for recipe food blogs with AdSense integration. Optimized for performance and monetization.
 Version: 1.0.0
+Requires at least: 5.0
+Tested up to: 6.4
+Requires PHP: 7.4
 License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: adsense-recipe-food-blog
 */
 
-/* Reset */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* Reset and Base Styles */
+html {
+    line-height: 1.15;
+    -webkit-text-size-adjust: 100%;
 }
 
-/* Typography */
 body {
+    margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
     font-size: 16px;
     line-height: 1.6;
     color: #333;
 }
 
-/* Layout */
-.site {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
+/* Header Styles */
+.site-header {
+    background: #fff;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Header */
-.site-header {
-    padding: 20px 0;
-    border-bottom: 1px solid #eee;
-    margin-bottom: 40px;
+.site-branding {
+    text-align: center;
+    margin-bottom: 1rem;
 }
 
 .site-title {
-    font-size: 2em;
     margin: 0;
+    font-size: 2rem;
+    font-weight: bold;
 }
 
 .site-title a {
@@ -50,65 +51,69 @@ body {
 }
 
 .site-description {
+    margin: 0.5rem 0 0;
     color: #666;
-    margin: 5px 0 0;
 }
 
 /* Navigation */
 .main-navigation {
-    margin-top: 20px;
+    margin: 1rem 0;
 }
 
 .main-navigation ul {
     list-style: none;
-    padding: 0;
     margin: 0;
+    padding: 0;
     display: flex;
+    justify-content: center;
     flex-wrap: wrap;
 }
 
 .main-navigation li {
-    margin-right: 20px;
+    margin: 0 1rem;
 }
 
 .main-navigation a {
     color: #333;
     text-decoration: none;
+    padding: 0.5rem 0;
 }
 
-/* Content */
-.site-main {
-    margin-bottom: 40px;
+/* Recipe Content */
+.recipe-article {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
 }
 
 .entry-header {
-    margin-bottom: 30px;
+    text-align: center;
+    margin-bottom: 2rem;
 }
 
 .entry-title {
-    font-size: 2.5em;
-    margin: 0 0 10px;
+    margin: 0 0 1rem;
+    font-size: 2.5rem;
+    color: #333;
 }
 
 .entry-meta {
     color: #666;
-    font-size: 0.9em;
-    margin-bottom: 20px;
+    font-size: 0.9rem;
 }
 
-.entry-content {
-    margin-bottom: 40px;
+.recipe-featured-image {
+    margin: 2rem 0;
 }
 
-/* Recipe Specific Styles */
 .recipe-meta {
-    background: #f9f9f9;
-    padding: 20px;
-    border-radius: 5px;
-    margin-bottom: 30px;
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 1.5rem;
+    background: #f9f9f9;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 2rem 0;
 }
 
 .recipe-meta>div {
@@ -116,89 +121,78 @@ body {
     min-width: 200px;
 }
 
+.recipe-meta strong {
+    display: block;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+/* Ingredients */
 .recipe-ingredients {
-    margin-bottom: 30px;
+    margin: 2rem 0;
 }
 
-.recipe-ingredients h2,
-.recipe-instructions h2,
-.recipe-notes h2 {
-    margin-bottom: 20px;
-    font-size: 1.5em;
-}
-
-.recipe-ingredients ul {
+.ingredients-list {
     list-style: none;
     padding: 0;
+    margin: 1rem 0;
 }
 
-.recipe-ingredients li {
-    margin-bottom: 10px;
+.ingredients-list li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+/* Instructions */
+.recipe-instructions {
+    margin: 2rem 0;
+}
+
+.instructions-list {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+    counter-reset: instruction;
+}
+
+.instructions-list li {
+    position: relative;
+    padding: 1rem 0 1rem 3rem;
+    margin-bottom: 1rem;
+    counter-increment: instruction;
+}
+
+.instructions-list li::before {
+    content: counter(instruction);
+    position: absolute;
+    left: 0;
+    top: 1rem;
+    width: 2rem;
+    height: 2rem;
+    background: #333;
+    color: #fff;
+    border-radius: 50%;
     display: flex;
-    align-items: baseline;
-    gap: 10px;
-}
-
-.recipe-ingredients .amount {
+    align-items: center;
+    justify-content: center;
     font-weight: bold;
-    min-width: 100px;
 }
 
-.recipe-instructions ol {
-    padding-left: 20px;
-}
-
-.recipe-instructions li {
-    margin-bottom: 15px;
-}
-
+/* Recipe Notes */
 .recipe-notes {
-    background: #fff9e6;
-    padding: 20px;
-    border-radius: 5px;
-    margin-top: 30px;
-}
-
-/* Featured Image */
-.post-thumbnail {
-    margin-bottom: 30px;
-}
-
-.post-thumbnail img {
-    width: 100%;
-    height: auto;
-    border-radius: 5px;
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: #f9f9f9;
+    border-radius: 8px;
 }
 
 /* Footer */
 .site-footer {
-    padding: 40px 0;
-    border-top: 1px solid #eee;
-    margin-top: 40px;
-}
-
-.site-info {
+    background: #333;
+    color: #fff;
+    padding: 2rem 1rem;
     text-align: center;
-    color: #666;
-    margin-bottom: 20px;
-}
-
-.footer-navigation ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.footer-navigation li {
-    margin: 0 10px;
-}
-
-.footer-navigation a {
-    color: #666;
-    text-decoration: none;
+    margin-top: 4rem;
 }
 
 /* AMP Specific Styles */
@@ -208,28 +202,142 @@ amp-img {
 }
 
 amp-ad {
-    margin: 30px 0;
+    margin: 2rem auto;
+    background: #ffebeb;
+    height: 250px;
+    max-width: 300px;
 }
 
-/* Responsive Design */
-@media screen and (max-width: 768px) {
-    .site-title {
-        font-size: 1.5em;
-    }
+amp-ad::before {
+    content: 'Advertisement';
+    display: block;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+}
 
+/* Center ads in their containers */
+.recipe-content amp-ad,
+.recipe-article>amp-ad {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Responsive ad container */
+.ad-container {
+    max-width: 100%;
+    margin: 2rem auto;
+    overflow: hidden;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
     .entry-title {
-        font-size: 2em;
+        font-size: 2rem;
     }
 
-    .recipe-meta>div {
-        flex: 100%;
-    }
-
-    .main-navigation ul {
+    .recipe-meta {
         flex-direction: column;
     }
 
-    .main-navigation li {
-        margin: 10px 0;
+    .recipe-meta>div {
+        min-width: 100%;
     }
+
+    .instructions-list li {
+        padding-left: 2.5rem;
+    }
+
+    amp-ad {
+        margin: 1.5rem auto;
+    }
+}
+
+/* Print Styles */
+@media print {
+
+    .site-header,
+    .site-footer,
+    .entry-meta,
+    amp-ad {
+        display: none;
+    }
+
+    .recipe-article {
+        max-width: 100%;
+        padding: 0;
+    }
+
+    .entry-title {
+        font-size: 24pt;
+    }
+
+    .recipe-meta,
+    .recipe-ingredients,
+    .recipe-instructions {
+        page-break-inside: avoid;
+    }
+}
+
+/* Ad Placeholder Styles */
+.ad-placeholder {
+    width: 100%;
+    height: 100%;
+    background: #ffebeb;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed #ff8080;
+    color: #ff4040;
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 1rem;
+}
+
+.ad-placeholder .ad-size {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: #ff6666;
+}
+
+@media (max-width: 768px) {
+    .ad-placeholder {
+        width: 100%;
+        max-width: 300px;
+        margin: 1.5rem auto;
+    }
+}
+
+.ad-test-container {
+    margin: 2rem auto;
+    max-width: 300px;
+    background: #ff0000;
+    padding: 1rem;
+    text-align: center;
+}
+
+amp-ad {
+    background: #ffebeb;
+    height: 250px !important;
+    max-width: 300px;
+}
+
+amp-ad [placeholder] {
+    background: #ff0000;
+    color: white;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    height: 100%;
+}
+
+/* Make sure the containers are visible in the content */
+.recipe-content .ad-test-container {
+    margin: 3rem auto;
+    border: 4px solid #ff0000;
 }

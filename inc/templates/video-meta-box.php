@@ -2,13 +2,26 @@
 
 /**
  * Recipe Video Meta Box Template
- * 
- * This template should only be loaded in the WordPress admin area
+ *
+ * @package TiffyCooks
  */
 
 // Exit if accessed directly
 if (!defined('ABSPATH')) {
     exit;
+}
+
+// Check if WordPress core is loaded
+if (!function_exists('wp_verify_nonce')) {
+    require_once(ABSPATH . 'wp-includes/pluggable.php');
+}
+
+if (!function_exists('esc_html_e')) {
+    require_once(ABSPATH . 'wp-includes/formatting.php');
+}
+
+if (!function_exists('esc_attr')) {
+    require_once(ABSPATH . 'wp-includes/formatting.php');
 }
 
 // Verify this is being loaded in admin context
@@ -18,114 +31,102 @@ if (!is_admin()) {
 ?>
 
 <div class="video-meta-box">
-    <p class="description">Add a video to your recipe. This will be included in the recipe schema and displayed on the recipe page.</p>
-
     <p>
-        <label for="recipe_video_url">Video URL:</label>
-        <input type="url"
-            id="recipe_video_url"
-            name="recipe_video_url"
-            value="<?php echo esc_url($video_url); ?>"
-            style="width: 100%;"
-            placeholder="Enter a YouTube or Vimeo URL for your recipe video">
-        <span class="description">Enter a YouTube or Vimeo URL for your recipe video.</span>
+        <label for="recipe_video_url"><?php esc_html_e('Video URL:', 'adsense-recipe-food-blog'); ?></label>
+        <input type="url" id="recipe_video_url" name="recipe_video_url" value="<?php echo esc_url($video_url); ?>" class="large-text" />
+        <span class="description"><?php esc_html_e('Enter the URL of your recipe video (YouTube, Vimeo, etc.).', 'adsense-recipe-food-blog'); ?></span>
     </p>
 
     <p>
-        <label for="recipe_video_embed">Video Embed Code:</label>
-        <textarea id="recipe_video_embed"
-            name="recipe_video_embed"
-            rows="4"
-            style="width: 100%;"
-            placeholder="Alternatively, paste the video embed code. Make sure it's AMP-compatible."><?php echo esc_textarea($video_embed); ?></textarea>
-        <span class="description">Alternatively, paste the video embed code. Make sure it's AMP-compatible.</span>
+        <label for="recipe_video_embed"><?php esc_html_e('Video Embed Code:', 'adsense-recipe-food-blog'); ?></label>
+        <textarea id="recipe_video_embed" name="recipe_video_embed" rows="4" class="large-text"><?php echo esc_textarea($video_embed); ?></textarea>
+        <span class="description"><?php esc_html_e('Or paste the embed code from your video platform.', 'adsense-recipe-food-blog'); ?></span>
     </p>
 
-    <p>
-        <label>Video Thumbnail:</label>
-    <div class="video-thumbnail-preview" style="margin: 10px 0;">
+    <div class="video-thumbnail">
+        <p>
+            <label><?php esc_html_e('Video Thumbnail:', 'adsense-recipe-food-blog'); ?></label>
+        <div class="thumbnail-preview">
+            <?php if ($video_thumbnail): ?>
+                <img src="<?php echo esc_url($video_thumbnail); ?>" alt="<?php esc_attr_e('Video thumbnail', 'adsense-recipe-food-blog'); ?>" />
+            <?php endif; ?>
+        </div>
+        <input type="hidden" name="recipe_video_thumbnail_id" id="recipe_video_thumbnail_id" value="<?php echo esc_attr($video_thumbnail_id); ?>" />
+        <button type="button" class="button upload-thumbnail"><?php esc_html_e('Set thumbnail', 'adsense-recipe-food-blog'); ?></button>
         <?php if ($video_thumbnail): ?>
-            <img src="<?php echo esc_url($video_thumbnail); ?>" style="max-width: 150px; height: auto;">
+            <button type="button" class="button remove-thumbnail"><?php esc_html_e('Remove thumbnail', 'adsense-recipe-food-blog'); ?></button>
         <?php endif; ?>
+        </p>
     </div>
-    <input type="hidden"
-        name="recipe_video_thumbnail_id"
-        id="recipe_video_thumbnail_id"
-        value="<?php echo esc_attr($video_thumbnail_id); ?>">
-    <button type="button"
-        class="button"
-        id="upload_video_thumbnail_button">
-        <?php echo $video_thumbnail ? 'Change thumbnail' : 'Set thumbnail'; ?>
-    </button>
-    <?php if ($video_thumbnail): ?>
-        <button type="button"
-            class="button"
-            id="remove_video_thumbnail_button">
-            Remove thumbnail
-        </button>
-    <?php endif; ?>
-    <p class="description">Select an image to use as the video thumbnail. This will be used in the recipe schema.</p>
-    </p>
 </div>
 
-<script>
-    jQuery(document).ready(function($) {
-        // Video thumbnail upload
-        $('#upload_video_thumbnail_button').click(function(e) {
-            e.preventDefault();
-
-            const frame = wp.media({
-                title: 'Select or Upload Video Thumbnail',
-                button: {
-                    text: 'Use this image'
-                },
-                multiple: false
-            });
-
-            frame.on('select', function() {
-                const attachment = frame.state().get('selection').first().toJSON();
-                $('#recipe_video_thumbnail_id').val(attachment.id);
-                $('.video-thumbnail-preview').html(`<img src="${attachment.url}" style="max-width: 150px; height: auto;">`);
-                $('#upload_video_thumbnail_button').text('Change thumbnail');
-
-                if (!$('#remove_video_thumbnail_button').length) {
-                    $('#upload_video_thumbnail_button').after(`
-                    <button type="button" class="button" id="remove_video_thumbnail_button">
-                        Remove thumbnail
-                    </button>
-                `);
-                }
-            });
-
-            frame.open();
-        });
-
-        // Remove thumbnail
-        $(document).on('click', '#remove_video_thumbnail_button', function() {
-            $('#recipe_video_thumbnail_id').val('');
-            $('.video-thumbnail-preview').empty();
-            $('#upload_video_thumbnail_button').text('Set thumbnail');
-            $(this).remove();
-        });
-    });
-</script>
-
 <style>
-    .video-meta-box {
-        padding: 12px;
-        background: #fff;
-    }
-
     .video-meta-box label {
         display: block;
-        font-weight: 600;
+        font-weight: bold;
         margin-bottom: 5px;
     }
 
     .video-meta-box .description {
         display: block;
-        color: #666;
         font-style: italic;
+        color: #666;
         margin-top: 5px;
     }
+
+    .video-thumbnail .thumbnail-preview {
+        margin: 10px 0;
+        max-width: 200px;
+    }
+
+    .video-thumbnail .thumbnail-preview img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .video-thumbnail .button {
+        margin-right: 10px;
+    }
 </style>
+
+<script>
+    jQuery(document).ready(function($) {
+        // Check if wp.media is available
+        if (typeof wp !== 'undefined' && wp.media && wp.media.editor) {
+            var frame;
+
+            $('.upload-thumbnail').on('click', function(e) {
+                e.preventDefault();
+
+                if (frame) {
+                    frame.open();
+                    return;
+                }
+
+                frame = wp.media({
+                    title: '<?php esc_html_e('Select or Upload Video Thumbnail', 'adsense-recipe-food-blog'); ?>',
+                    button: {
+                        text: '<?php esc_html_e('Use this image', 'adsense-recipe-food-blog'); ?>'
+                    },
+                    multiple: false
+                });
+
+                frame.on('select', function() {
+                    var attachment = frame.state().get('selection').first().toJSON();
+                    $('#recipe_video_thumbnail_id').val(attachment.id);
+                    $('.thumbnail-preview').html('<img src="' + attachment.url + '" alt="" />');
+                    $('.remove-thumbnail').show();
+                });
+
+                frame.open();
+            });
+
+            $('.remove-thumbnail').on('click', function(e) {
+                e.preventDefault();
+                $('#recipe_video_thumbnail_id').val('');
+                $('.thumbnail-preview').empty();
+                $(this).hide();
+            });
+        }
+    });
+</script>
