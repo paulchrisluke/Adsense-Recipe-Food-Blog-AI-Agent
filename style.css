@@ -115,7 +115,7 @@ h6 {
     flex: 1;
     padding: var(--spacing-lg);
     width: 100%;
-    max-width: 1400px;
+    max-width: 800px;
     margin: 0 auto;
 }
 
@@ -500,12 +500,12 @@ amp-sidebar {
     margin-bottom: var(--spacing-xs);
 }
 
-/* Archive Pages (Home & Category) */
+/* Archive Pages */
 .archive-header {
-    margin-bottom: var(--spacing-xl);
     text-align: center;
-    max-width: 800px;
     margin: 0 auto var(--spacing-xl);
+    max-width: 800px;
+    padding: 0 var(--spacing-md);
 }
 
 .archive-title {
@@ -519,24 +519,25 @@ amp-sidebar {
     font-family: var(--font-sans);
     font-size: 1.1rem;
     color: var(--text-secondary);
-    margin: 0 auto;
+    margin: 0 0 var(--spacing-md);
 }
 
 /* Posts List */
 .posts-list {
-    max-width: 800px;
-    margin: 0 auto;
     display: flex;
     flex-direction: column;
     gap: var(--spacing-lg);
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
 }
 
 .post-card {
     background: var(--background-primary);
     border-radius: var(--border-radius);
     overflow: hidden;
-    transition: transform 0.2s ease;
     border: 1px solid rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease;
 }
 
 .post-card:hover {
@@ -593,6 +594,44 @@ amp-sidebar {
     gap: var(--spacing-sm);
 }
 
+.post-card-meta .category {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.post-card-meta .category:hover {
+    text-decoration: underline;
+}
+
+/* Loading Indicator */
+.loading-indicator {
+    text-align: center;
+    padding: var(--spacing-lg) 0;
+    color: var(--text-secondary);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .archive-title {
+        font-size: 2rem;
+    }
+
+    .post-card-content {
+        padding: var(--spacing-md);
+    }
+
+    .post-card-title {
+        font-size: 1.25rem;
+    }
+
+    .post-card-excerpt {
+        font-size: 0.875rem;
+    }
+}
+
 /* Print Styles */
 @media print {
 
@@ -616,35 +655,18 @@ amp-sidebar {
 
 /* Responsive Adjustments */
 @media (max-width: 1024px) {
-    .desktop-sidebar {
-        display: none;
-    }
-
     .site-wrapper {
         margin-left: 0;
     }
 
-    .menu-toggle {
-        display: block;
-    }
-
-    .site-header-inner {
-        padding-left: calc(var(--spacing-lg) + 40px);
+    .site-content {
+        padding: var(--spacing-md);
     }
 }
 
 @media (max-width: 768px) {
-    .site-content {
-        padding: var(--spacing-md);
-    }
-
-    .site-header {
-        height: 56px;
-    }
-
-    .site-header-inner {
-        padding: 0 var(--spacing-md);
-        padding-left: calc(var(--spacing-md) + 40px);
+    .archive-title {
+        font-size: 2rem;
     }
 
     .post-card-content {
@@ -658,9 +680,58 @@ amp-sidebar {
     .post-card-excerpt {
         font-size: 0.875rem;
     }
+}
 
-    .recipe-meta {
-        grid-template-columns: 1fr;
-        gap: var(--spacing-sm);
+/* AMP Next Page (Infinite Scroll) */
+amp-next-page {
+    margin: 0 !important;
+    width: 100% !important;
+}
+
+/* Hide default AMP next page elements */
+amp-next-page>div[separator] {
+    display: none !important;
+}
+
+amp-next-page>div[recommendation-box] {
+    display: none !important;
+}
+
+/* Custom separator */
+.page-separator {
+    margin: var(--spacing-xl) 0;
+    height: 1px;
+    background: rgba(0, 0, 0, 0.08);
+    position: relative;
+}
+
+/* Loading indicator */
+.loading-indicator {
+    text-align: center;
+    padding: var(--spacing-lg) 0;
+    color: var(--text-secondary);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    animation: loading-pulse 1.5s infinite;
+}
+
+@keyframes loading-pulse {
+    0% {
+        opacity: 0.4;
     }
+
+    50% {
+        opacity: 0.8;
+    }
+
+    100% {
+        opacity: 0.4;
+    }
+}
+
+/* Ensure consistent layout for loaded pages */
+amp-next-page>div[fetch-more] {
+    margin: 0 auto;
+    max-width: 800px;
+    width: 100%;
 }

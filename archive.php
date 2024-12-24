@@ -13,8 +13,11 @@ get_header();
     <?php
     if (is_category()) {
         echo '<h1 class="archive-title">' . single_cat_title('', false) . '</h1>';
-        if (get_the_archive_description()) {
-            echo '<div class="archive-description">' . get_the_archive_description() . '</div>';
+
+        // Get category description
+        $category_description = category_description();
+        if ($category_description) {
+            echo '<div class="archive-description">' . $category_description . '</div>';
         }
     } else {
         the_archive_title('<h1 class="archive-title">', '</h1>');
@@ -35,13 +38,9 @@ get_header();
                         <?php
                         if (function_exists('is_amp_endpoint') && is_amp_endpoint()) {
                             $thumbnail_url = get_the_post_thumbnail_url(null, 'large');
-                            $image_width = 800;
-                            $image_height = 450; // 16:9 aspect ratio
                             printf(
-                                '<amp-img src="%1$s" width="%2$d" height="%3$d" alt="%4$s" layout="responsive"></amp-img>',
+                                '<amp-img src="%1$s" width="800" height="450" alt="%2$s" layout="responsive"></amp-img>',
                                 esc_url($thumbnail_url),
-                                $image_width,
-                                $image_height,
                                 esc_attr(get_the_title())
                             );
                         } else {
@@ -65,10 +64,14 @@ get_header();
                             <?php echo get_the_date(); ?>
                         </time>
                         <?php
-                        $categories = get_the_category();
-                        if ($categories) {
-                            echo '<span class="separator">•</span>';
-                            echo '<span class="category">' . esc_html($categories[0]->name) . '</span>';
+                        if (!is_category()) {
+                            $categories = get_the_category();
+                            if ($categories) {
+                                echo '<span class="separator">•</span>';
+                                echo '<a href="' . esc_url(get_category_link($categories[0]->term_id)) . '" class="category">';
+                                echo esc_html($categories[0]->name);
+                                echo '</a>';
+                            }
                         }
                         ?>
                     </div>
@@ -77,12 +80,29 @@ get_header();
         <?php
         endwhile;
 
-        // Add pagination if needed
-        the_posts_pagination(array(
-            'mid_size' => 2,
-            'prev_text' => '&larr;',
-            'next_text' => '&rarr;',
-        ));
+        // Add infinite scroll only if there are more pages
+        global $wp_query;
+        if ($wp_query->max_num_pages > 1) :
+        ?>
+            <amp-next-page>
+                <script type="application/json">
+                    <?php
+                    $pages = array();
+                    for ($i = 2; $i <= min($wp_query->max_num_pages, 3); $i++) {
+                        $pages[] = array(
+                            'url' => get_pagenum_link($i),
+                            'title' => get_the_archive_title()
+                        );
+                    }
+                    echo json_encode($pages);
+                    ?>
+                </script>
+                <div load-more-loading>
+                    <div class="loading-indicator">Loading more recipes...</div>
+                </div>
+            </amp-next-page>
+        <?php
+        endif;
 
     else :
         ?>
