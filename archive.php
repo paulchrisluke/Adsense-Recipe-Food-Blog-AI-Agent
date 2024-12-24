@@ -26,11 +26,19 @@ get_header();
     ?>
 </div>
 
+<?php
+// Top of archive ad
+echo tiffycooks_amp_insert_ad('archive-top', 'responsive');
+?>
+
 <div class="posts-list">
     <?php
     if (have_posts()) :
+        $post_count = 0;
+
         while (have_posts()) :
             the_post();
+            $post_count++;
     ?>
             <article <?php post_class('post-card'); ?>>
                 <?php if (has_post_thumbnail()) : ?>
@@ -77,6 +85,14 @@ get_header();
                     </div>
                 </div>
             </article>
+
+            <?php
+            // Insert ad after every 3 posts
+            if ($post_count % 3 === 0) {
+                echo tiffycooks_amp_insert_ad('archive-between', 'responsive');
+            }
+            ?>
+
         <?php
         endwhile;
 
@@ -113,4 +129,7 @@ get_header();
 </div>
 
 <?php
+// Bottom of archive ad
+echo tiffycooks_amp_insert_ad('archive-bottom', 'responsive');
+
 get_footer();
