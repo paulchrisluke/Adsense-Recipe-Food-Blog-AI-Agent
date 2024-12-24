@@ -10,23 +10,13 @@ get_header(); ?>
 
 <main id="main" class="site-main">
     <?php while (have_posts()) : the_post(); ?>
-        <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
-            <header class="entry-header">
-                <?php if (has_post_thumbnail()) : ?>
-                    <div class="post-thumbnail">
-                        <?php if (function_exists('is_amp_endpoint') && is_amp_endpoint()) : ?>
-                            <amp-img src="<?php echo esc_url(get_the_post_thumbnail_url(null, 'large')); ?>"
-                                width="800"
-                                height="600"
-                                layout="responsive"
-                                alt="<?php echo esc_attr(get_the_title()); ?>">
-                            </amp-img>
-                        <?php else : ?>
-                            <?php the_post_thumbnail('large'); ?>
-                        <?php endif; ?>
-                    </div>
-                <?php endif; ?>
+        <article id="post-<?php the_ID(); ?>" <?php post_class('recipe-article single-column'); ?>>
+            <?php
+            // Top of page - responsive ad
+            echo tiffycooks_amp_insert_ad('top', 'responsive');
+            ?>
 
+            <header class="entry-header">
                 <h1 class="entry-title"><?php the_title(); ?></h1>
 
                 <div class="entry-meta">
@@ -35,15 +25,32 @@ get_header(); ?>
                 </div>
             </header>
 
-            <div class="entry-content">
+            <?php if (has_post_thumbnail()) : ?>
+                <div class="post-thumbnail">
+                    <?php if (function_exists('is_amp_endpoint') && is_amp_endpoint()) : ?>
+                        <amp-img src="<?php echo esc_url(get_the_post_thumbnail_url(null, 'large')); ?>"
+                            width="800"
+                            height="600"
+                            layout="responsive"
+                            alt="<?php echo esc_attr(get_the_title()); ?>">
+                        </amp-img>
+                    <?php else : ?>
+                        <?php the_post_thumbnail('large'); ?>
+                    <?php endif; ?>
+                </div>
+
                 <?php
-                // Display the main content first
+                // After featured image - fixed height ad
+                echo tiffycooks_amp_insert_ad('after-image', 'fixed-height');
+                ?>
+            <?php endif; ?>
+
+            <div class="recipe-content">
+                <?php
+                // Display the main content
                 the_content();
 
-                // Insert ad after the introduction
-                echo tiffycooks_amp_insert_ad('after-intro');
-
-                // Display recipe details if available
+                // Recipe details section
                 $prep_time = get_post_meta(get_the_ID(), '_recipe_prep_time', true);
                 $cook_time = get_post_meta(get_the_ID(), '_recipe_cook_time', true);
                 $servings = get_post_meta(get_the_ID(), '_recipe_servings', true);
@@ -71,7 +78,12 @@ get_header(); ?>
                 <?php endif; ?>
 
                 <?php
-                // Display ingredients if available
+                // Before ingredients - responsive ad
+                echo tiffycooks_amp_insert_ad('before-ingredients', 'responsive');
+                ?>
+
+                <?php
+                // Display ingredients
                 $ingredients = tiffycooks_get_ingredients(get_the_ID());
                 if (!empty($ingredients)) : ?>
                     <div class="recipe-ingredients">
@@ -87,27 +99,37 @@ get_header(); ?>
                             <?php endforeach; ?>
                         </ul>
                     </div>
+
+                    <?php
+                    // After ingredients - fixed height ad
+                    echo tiffycooks_amp_insert_ad('after-ingredients', 'fixed-height');
+                    ?>
                 <?php endif; ?>
 
                 <?php
-                // Insert ad before instructions
-                echo tiffycooks_amp_insert_ad('before-instructions');
-
-                // Display instructions if available
+                // Display instructions
                 $instructions = tiffycooks_get_instructions(get_the_ID());
                 if (!empty($instructions)) : ?>
                     <div class="recipe-instructions">
                         <h2>Instructions</h2>
                         <ol>
-                            <?php foreach ($instructions as $instruction) : ?>
-                                <li><?php echo esc_html($instruction); ?></li>
-                            <?php endforeach; ?>
+                            <?php
+                            $instruction_count = count($instructions);
+                            foreach ($instructions as $index => $instruction) :
+                                echo '<li>' . esc_html($instruction) . '</li>';
+
+                                // Insert ad after 1/3 and 2/3 of instructions
+                                if ($index === floor($instruction_count / 3) || $index === floor($instruction_count * 2 / 3)) {
+                                    echo tiffycooks_amp_insert_ad('in-instructions', 'fixed-height');
+                                }
+                            endforeach;
+                            ?>
                         </ol>
                     </div>
                 <?php endif; ?>
 
                 <?php
-                // Display recipe notes if available
+                // Display recipe notes
                 $notes = get_post_meta(get_the_ID(), '_recipe_notes', true);
                 if (!empty($notes)) : ?>
                     <div class="recipe-notes">
@@ -117,8 +139,8 @@ get_header(); ?>
                 <?php endif; ?>
 
                 <?php
-                // Insert ad after the recipe
-                echo tiffycooks_amp_insert_ad('after-recipe');
+                // Bottom of content - responsive ad
+                echo tiffycooks_amp_insert_ad('bottom', 'responsive');
                 ?>
             </div>
 
@@ -136,14 +158,6 @@ get_header(); ?>
                 ?>
             </footer>
         </article>
-
-        <?php
-        // If comments are open or we have at least one comment, load up the comment template.
-        if (comments_open() || get_comments_number()) :
-            comments_template();
-        endif;
-        ?>
-
     <?php endwhile; ?>
 </main>
 

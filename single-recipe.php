@@ -13,6 +13,20 @@ get_header();
         the_post();
     ?>
         <article id="recipe-<?php the_ID(); ?>" <?php post_class('recipe-article'); ?>>
+            <!-- Top of page ad -->
+            <div class="ad-test-container">
+                <amp-ad width="300"
+                    height="250"
+                    type="fake"
+                    data-use-a4a="true">
+                    <div placeholder>
+                        <div style="background: red; color: white; padding: 20px; text-align: center;">
+                            TOP OF PAGE AD
+                        </div>
+                    </div>
+                </amp-ad>
+            </div>
+
             <header class="entry-header">
                 <?php the_title('<h1 class="entry-title">', '</h1>'); ?>
 
@@ -27,9 +41,7 @@ get_header();
                 </div>
             </header>
 
-            <?php
-            // First ad unit - After header
-            ?>
+            <!-- After header ad -->
             <div class="ad-test-container">
                 <amp-ad width="300"
                     height="250"
@@ -37,7 +49,7 @@ get_header();
                     data-use-a4a="true">
                     <div placeholder>
                         <div style="background: red; color: white; padding: 20px; text-align: center;">
-                            TEST AD PLACEHOLDER
+                            AFTER HEADER AD
                         </div>
                     </div>
                 </amp-ad>
@@ -58,18 +70,8 @@ get_header();
                         </amp-img>
                     <?php endif; ?>
                 </div>
-            <?php endif; ?>
 
-            <div class="recipe-content">
-                <?php if (!empty(get_the_content())) : ?>
-                    <div class="recipe-description">
-                        <?php the_content(); ?>
-                    </div>
-                <?php endif; ?>
-
-                <?php
-                // Second ad unit - After description
-                ?>
+                <!-- After featured image ad -->
                 <div class="ad-test-container">
                     <amp-ad width="300"
                         height="250"
@@ -77,12 +79,35 @@ get_header();
                         data-use-a4a="true">
                         <div placeholder>
                             <div style="background: red; color: white; padding: 20px; text-align: center;">
-                                TEST AD PLACEHOLDER
+                                AFTER IMAGE AD
                             </div>
                         </div>
                     </amp-ad>
                 </div>
+            <?php endif; ?>
 
+            <div class="recipe-content">
+                <?php if (!empty(get_the_content())) : ?>
+                    <div class="recipe-description">
+                        <?php the_content(); ?>
+                    </div>
+
+                    <!-- After description ad -->
+                    <div class="ad-test-container">
+                        <amp-ad width="300"
+                            height="250"
+                            type="fake"
+                            data-use-a4a="true">
+                            <div placeholder>
+                                <div style="background: red; color: white; padding: 20px; text-align: center;">
+                                    AFTER DESCRIPTION AD
+                                </div>
+                            </div>
+                        </amp-ad>
+                    </div>
+                <?php endif; ?>
+
+                <!-- Recipe meta information -->
                 <div class="recipe-meta">
                     <?php
                     $recipe_data = tiffycooks_recipe_manager()->get_recipe_rest_data();
@@ -105,9 +130,7 @@ get_header();
                     </div>
                 </div>
 
-                <?php
-                // Third ad unit - Before ingredients
-                ?>
+                <!-- Before ingredients ad -->
                 <div class="ad-test-container">
                     <amp-ad width="300"
                         height="250"
@@ -115,12 +138,13 @@ get_header();
                         data-use-a4a="true">
                         <div placeholder>
                             <div style="background: red; color: white; padding: 20px; text-align: center;">
-                                TEST AD PLACEHOLDER
+                                BEFORE INGREDIENTS AD
                             </div>
                         </div>
                     </amp-ad>
                 </div>
 
+                <!-- Ingredients section -->
                 <div class="recipe-ingredients">
                     <h2><?php esc_html_e('Ingredients', 'adsense-recipe-food-blog'); ?></h2>
                     <?php if (!empty($recipe_data['ingredients'])) : ?>
@@ -132,9 +156,7 @@ get_header();
                     <?php endif; ?>
                 </div>
 
-                <?php
-                // Fourth ad unit - Before instructions
-                ?>
+                <!-- After ingredients ad -->
                 <div class="ad-test-container">
                     <amp-ad width="300"
                         height="250"
@@ -142,26 +164,46 @@ get_header();
                         data-use-a4a="true">
                         <div placeholder>
                             <div style="background: red; color: white; padding: 20px; text-align: center;">
-                                TEST AD PLACEHOLDER
+                                AFTER INGREDIENTS AD
                             </div>
                         </div>
                     </amp-ad>
                 </div>
 
+                <!-- Instructions section -->
                 <div class="recipe-instructions">
                     <h2><?php esc_html_e('Instructions', 'adsense-recipe-food-blog'); ?></h2>
                     <?php if (!empty($recipe_data['instructions'])) : ?>
                         <ol class="instructions-list">
-                            <?php foreach ($recipe_data['instructions'] as $step) : ?>
-                                <li><?php echo esc_html($step); ?></li>
-                            <?php endforeach; ?>
+                            <?php
+                            $instruction_count = count($recipe_data['instructions']);
+                            foreach ($recipe_data['instructions'] as $index => $step) :
+                                echo '<li>' . esc_html($step) . '</li>';
+
+                                // Add an ad after every 3 steps (except the last step)
+                                if (($index + 1) % 3 === 0 && ($index + 1) < $instruction_count) :
+                            ?>
+                                    <div class="ad-test-container">
+                                        <amp-ad width="300"
+                                            height="250"
+                                            type="fake"
+                                            data-use-a4a="true">
+                                            <div placeholder>
+                                                <div style="background: red; color: white; padding: 20px; text-align: center;">
+                                                    MID-INSTRUCTIONS AD <?php echo floor(($index + 1) / 3); ?>
+                                                </div>
+                                            </div>
+                                        </amp-ad>
+                                    </div>
+                            <?php
+                                endif;
+                            endforeach;
+                            ?>
                         </ol>
                     <?php endif; ?>
                 </div>
 
-                <?php
-                // Fifth ad unit - After instructions
-                ?>
+                <!-- After instructions ad -->
                 <div class="ad-test-container">
                     <amp-ad width="300"
                         height="250"
@@ -169,7 +211,7 @@ get_header();
                         data-use-a4a="true">
                         <div placeholder>
                             <div style="background: red; color: white; padding: 20px; text-align: center;">
-                                TEST AD PLACEHOLDER
+                                AFTER INSTRUCTIONS AD
                             </div>
                         </div>
                     </amp-ad>
@@ -180,13 +222,25 @@ get_header();
                         <h2><?php esc_html_e('Recipe Notes', 'adsense-recipe-food-blog'); ?></h2>
                         <?php echo wp_kses_post(wpautop($recipe_data['notes'])); ?>
                     </div>
+
+                    <!-- After notes ad -->
+                    <div class="ad-test-container">
+                        <amp-ad width="300"
+                            height="250"
+                            type="fake"
+                            data-use-a4a="true">
+                            <div placeholder>
+                                <div style="background: red; color: white; padding: 20px; text-align: center;">
+                                    AFTER NOTES AD
+                                </div>
+                            </div>
+                        </amp-ad>
+                    </div>
                 <?php endif; ?>
             </div>
         </article>
 
-        <?php
-        // Final ad unit - After content
-        ?>
+        <!-- Bottom of page ad -->
         <div class="ad-test-container">
             <amp-ad width="300"
                 height="250"
@@ -194,7 +248,7 @@ get_header();
                 data-use-a4a="true">
                 <div placeholder>
                     <div style="background: red; color: white; padding: 20px; text-align: center;">
-                        TEST AD PLACEHOLDER
+                        BOTTOM OF PAGE AD
                     </div>
                 </div>
             </amp-ad>

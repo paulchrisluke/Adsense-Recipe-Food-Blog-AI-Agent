@@ -1,24 +1,12 @@
-<?php
-
-/**
- * The header for our theme
- *
- * @package TiffyCooks
- */
-?>
 <!doctype html>
-<html amp <?php language_attributes(); ?>>
+<html amp lang="<?php language_attributes(); ?>">
 
 <head>
-    <meta charset="<?php bloginfo('charset'); ?>">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
-    <link rel="profile" href="https://gmpg.org/xfn/11">
+    <meta name="theme-color" content="#ffffff">
+    <?php wp_head(); ?>
 
-    <!-- AMP Required Scripts -->
-    <script async src="https://cdn.ampproject.org/v0.js"></script>
-    <script async custom-element="amp-ad" src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
-
-    <!-- AMP boilerplate -->
     <style amp-boilerplate>
         body {
             -webkit-animation: -amp-start 8s steps(1, end) 0s 1 normal both;
@@ -88,12 +76,25 @@
         </style>
     </noscript>
 
-    <!-- Custom AMP styles -->
-    <style amp-custom>
-        <?php include get_template_directory() . '/style.css'; ?>
-    </style>
+    <!-- AMP Runtime -->
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
 
-    <?php wp_head(); ?>
+    <!-- AMP Components -->
+    <script async custom-element="amp-ad" src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
+
+    <!-- Custom Styles -->
+    <style amp-custom>
+        <?php
+        // Include the main stylesheet inline
+        $css_file = get_template_directory() . '/style.css';
+        if (file_exists($css_file)) {
+            $css = file_get_contents($css_file);
+            // Remove any !important declarations as they're not allowed in AMP
+            $css = preg_replace('/\s*!important/', '', $css);
+            echo $css;
+        }
+        ?>
+    </style>
 </head>
 
 <body <?php body_class(); ?>>
@@ -102,16 +103,21 @@
     <div id="page" class="site">
         <header id="masthead" class="site-header">
             <div class="site-branding">
+                <?php if (is_front_page() && is_home()) : ?>
+                    <h1 class="site-title">
+                        <a href="<?php echo esc_url(home_url('/')); ?>" rel="home">
+                            <?php bloginfo('name'); ?>
+                        </a>
+                    </h1>
+                <?php else : ?>
+                    <p class="site-title">
+                        <a href="<?php echo esc_url(home_url('/')); ?>" rel="home">
+                            <?php bloginfo('name'); ?>
+                        </a>
+                    </p>
+                <?php endif; ?>
+
                 <?php
-                if (is_front_page() && is_home()) :
-                ?>
-                    <h1 class="site-title"><a href="<?php echo esc_url(home_url('/')); ?>" rel="home"><?php bloginfo('name'); ?></a></h1>
-                <?php
-                else :
-                ?>
-                    <p class="site-title"><a href="<?php echo esc_url(home_url('/')); ?>" rel="home"><?php bloginfo('name'); ?></a></p>
-                <?php
-                endif;
                 $description = get_bloginfo('description', 'display');
                 if ($description || is_customize_preview()) :
                 ?>
@@ -123,8 +129,8 @@
                 <?php
                 wp_nav_menu(array(
                     'theme_location' => 'primary',
-                    'menu_id'        => 'primary-menu',
-                    'fallback_cb'    => false,
+                    'menu_id' => 'primary-menu',
+                    'fallback_cb' => false,
                 ));
                 ?>
             </nav>
