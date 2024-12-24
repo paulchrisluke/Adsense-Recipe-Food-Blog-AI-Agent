@@ -295,3 +295,50 @@ function tiffycooks_admin_scripts($hook)
     ));
 }
 add_action('admin_enqueue_scripts', 'tiffycooks_admin_scripts');
+
+// Add AJAX handler for recipe generation
+function tiffycooks_ajax_generate_recipe()
+{
+    check_ajax_referer('tiffycooks_generate_recipe', 'nonce');
+
+    if (!current_user_can('edit_posts')) {
+        wp_send_json_error('Unauthorized');
+        return;
+    }
+
+    $post_id = intval($_POST['post_id']);
+    if (!$post_id) {
+        wp_send_json_error('Invalid post ID');
+        return;
+    }
+
+    $post = get_post($post_id);
+    if (!$post) {
+        wp_send_json_error('Post not found');
+        return;
+    }
+
+    $agent = tiffycooks_get_recipe_agent();
+    $recipe_data = $agent->generate_recipe($post->post_title, $post->post_content);
+
+    if (is_wp_error($recipe_data)) {
+        wp_send_json_error($recipe_data->get_error_message());
+        return;
+    }
+
+    // Format the response data
+    $response = array(
+        'prep_time' => isset($recipe_data['prep_time']) ? intval($recipe_data['prep_time']) : '',
+        'cook_time' => isset($recipe_data['cook_time']) ? intval($recipe_data['cook_time']) : '',
+        'servings' => isset($recipe_data['servings']) ? intval($recipe_data['servings']) : '',
+        'ingredients' => isset($recipe_data['ingredients']) ? (array)$recipe_data['ingredients'] : array(),
+        'instructions' => isset($recipe_data['instructions']) ? (array)$recipe_data['instructions'] : array(),
+        'notes' => isset($recipe_data['notes']) ? sanitize_textarea_field($recipe_data['notes']) : ''
+    );
+
+    wp_send_json_success($response);
+}
+add_action('wp_ajax_tiffycooks_generate_recipe', 'tiffycooks_ajax_generate_recipe');
+
+// Include editor UI modifications
+require_once get_template_directory() . '/inc/editor-ui.php';

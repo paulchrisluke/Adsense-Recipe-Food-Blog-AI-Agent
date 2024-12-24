@@ -43,12 +43,20 @@ jQuery(document).ready(function($) {
             );
         })
         .fail(function(error) {
-            // Show error message
+            // Show error message with proper error handling
+            var errorMessage = error;
+            if (typeof error === 'object') {
+                errorMessage = error.responseText || error.statusText || 'Unknown error occurred';
+            }
+            
             $wrapper.append(
                 '<div class="message notice notice-error" style="margin-top: 10px;">' +
-                '<p>Failed to generate recipe details: ' + error + '</p>' +
+                '<p>Failed to generate recipe details: ' + $('<div/>').text(errorMessage).html() + '</p>' +
                 '</div>'
             );
+            
+            // Log the full error object for debugging
+            console.log('Recipe Generation Error:', error);
         })
         .always(function() {
             // Re-enable button and hide spinner
