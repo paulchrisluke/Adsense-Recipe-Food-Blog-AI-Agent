@@ -116,44 +116,50 @@ $posts_query = new WP_Query($args);
 
 <style>
     .site-content {
-        padding: 2rem 0;
+        padding: 0;
+        background: #f7f7f8;
+        width: 100%;
     }
 
     .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 1rem;
+        width: 100%;
+        margin: 0;
+        padding: 0;
     }
 
     .posts-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 2rem;
-        margin-bottom: 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        margin: 0;
+        background: rgba(0, 0, 0, 0.05);
+        width: 100%;
     }
 
     .post-card {
         background: #fff;
-        border-radius: 8px;
+        border-radius: 0;
         overflow: hidden;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s ease-in-out;
+        width: 100%;
+        border: none;
+        box-shadow: none;
     }
 
     .post-card:hover {
-        transform: translateY(-5px);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     }
 
     .post-card-inner {
-        height: 100%;
+        width: 100%;
         display: flex;
         flex-direction: column;
     }
 
     .post-thumbnail {
         position: relative;
-        padding-top: 56.25%;
-        /* 16:9 aspect ratio */
+        padding-top: 100%;
+        width: 100%;
     }
 
     .post-image {
@@ -166,14 +172,13 @@ $posts_query = new WP_Query($args);
     }
 
     .post-content {
-        padding: 1.5rem;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
+        padding: 1rem;
+        width: 100%;
+        max-width: 100%;
     }
 
     .post-title {
-        margin: 0 0 1rem;
+        margin: 0 0 0.75rem;
         font-size: 1.25rem;
         line-height: 1.4;
     }
@@ -190,8 +195,8 @@ $posts_query = new WP_Query($args);
     .post-meta {
         display: flex;
         flex-wrap: wrap;
-        gap: 1rem;
-        margin-bottom: 1rem;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
         font-size: 0.875rem;
         color: #666;
     }
@@ -208,8 +213,9 @@ $posts_query = new WP_Query($args);
 
     .post-excerpt {
         font-size: 0.9375rem;
-        line-height: 1.6;
-        color: #555;
+        line-height: 1.5;
+        color: #444;
+        margin-bottom: 0.75rem;
     }
 
     .no-posts {
@@ -218,7 +224,7 @@ $posts_query = new WP_Query($args);
     }
 
     .pagination {
-        margin-top: 2rem;
+        margin-top: 1rem;
         text-align: center;
     }
 
@@ -229,11 +235,13 @@ $posts_query = new WP_Query($args);
 
     .pagination a,
     .pagination span {
-        padding: 0.5rem 1rem;
-        border: 1px solid #ddd;
-        border-radius: 4px;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 6px;
         text-decoration: none;
         color: #333;
+        background: #fff;
+        font-size: 0.875rem;
     }
 
     .pagination a:hover,
@@ -243,18 +251,26 @@ $posts_query = new WP_Query($args);
         border-color: #007bff;
     }
 
+    /* Update sidebar navigation padding */
+    .sidebar-navigation {
+        flex: 1;
+        overflow-y: auto;
+        padding: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
     @media (max-width: 768px) {
-        .posts-grid {
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1.5rem;
-        }
 
+        .site-content,
+        .container,
+        .posts-grid,
+        .post-card,
+        .post-card-inner,
         .post-content {
-            padding: 1rem;
-        }
-
-        .post-title {
-            font-size: 1.125rem;
+            width: 100%;
+            max-width: 100%;
         }
     }
 </style>

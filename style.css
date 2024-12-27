@@ -282,7 +282,7 @@ amp-sidebar {
 .sidebar-navigation {
     flex: 1;
     overflow-y: auto;
-    padding: var(--spacing-md);
+    padding: var(--spacing-xl) var(--spacing-md);
     display: flex;
     flex-direction: column;
     gap: var(--spacing-lg);
@@ -490,7 +490,7 @@ amp-sidebar {
 .ad-container {
     margin: var(--spacing-xl) auto;
     text-align: center;
-    max-width: 800px;
+    max-width: 600px;
     width: 100%;
 }
 
@@ -513,7 +513,7 @@ amp-sidebar {
 .archive-header {
     text-align: center;
     margin: 0 auto var(--spacing-xl);
-    max-width: 800px;
+    max-width: 600px;
     padding: 0 var(--spacing-md);
 }
 
@@ -537,17 +537,20 @@ amp-sidebar {
     flex-direction: column;
     gap: var(--spacing-lg);
     width: 100%;
-    max-width: 800px;
+    max-width: 600px;
     margin: 0 auto;
-    padding: var(--spacing-lg) 0;
+    padding: var(--spacing-xl) 0;
 }
 
 .post-card {
+    width: 100%;
     background: var(--background-primary);
     border-radius: var(--border-radius);
     overflow: hidden;
     border: 1px solid rgba(0, 0, 0, 0.08);
     transition: transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
 }
 
 .post-card:hover {
@@ -556,9 +559,10 @@ amp-sidebar {
 
 .post-card-thumbnail {
     position: relative;
-    padding-top: 56.25%;
-    /* 16:9 aspect ratio */
+    padding-top: 100%;
+    /* Square aspect ratio like Instagram */
     background: var(--background-secondary);
+    width: 100%;
 }
 
 .post-card-thumbnail amp-img,
@@ -745,7 +749,7 @@ amp-next-page>div[recommendation-box] {
 /* Ensure consistent layout for loaded pages */
 amp-next-page>div[fetch-more] {
     margin: 0 auto;
-    max-width: 800px;
+    max-width: 600px;
     width: 100%;
 }
 
